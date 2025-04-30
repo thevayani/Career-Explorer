@@ -8,6 +8,7 @@ import axios from 'axios';
 
 function Selfintro() {
   let user = JSON.parse(localStorage.getItem("users"));
+  let Token = JSON.parse(localStorage.getItem("token")).token
   const cx = "84c171dacf1aa43c1"
   const apiKey = "AIzaSyC8kh_wDAmTboxQf3lvjBSChxhiNfjbPdU"
 
@@ -22,8 +23,8 @@ function Selfintro() {
  
 
   const getApi = () => {
-
-    axios.get(`https://thevayani.pythonanywhere.com/profile/${user.id}`).then((res) => {
+    const headers = { 'Authorization': `Bearer ${Token}` }
+    axios.get(`https://thevayani.pythonanywhere.com/profile/${user.id}`, { headers }).then((res) => {
       let getData = res.data.data.data
       console.log(getData)
       setuserInputValue(JSON.parse(getData))

@@ -8,7 +8,7 @@ import Header from './Header';
 
 function Resume() {
     let user = JSON.parse(localStorage.getItem("users"))
-
+    let Token = JSON.parse(localStorage.getItem("token")).token
     const navigate = useNavigate()
     const [skillValue, setSkillValue] = useState([])
     const [languageknownValue, setlanguageknownValue] = useState([])
@@ -157,15 +157,24 @@ function Resume() {
         const formData = new FormData();
         formData.append("user_id", user.id);
         formData.append("data", JSON.stringify(inputValue));
-
-        axios.post('https://thevayani.pythonanywhere.com/resume', formData).then((res) => {
-        })
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.post('https://thevayani.pythonanywhere.com/resume', formData, { headers }).then((res) => {
         alert("submit")
         navigate("/quiz")
+        }).catch((e) => {
+            if (e.response.status === 422 || e.response.status === 401) {
+                alert("Token error");
+                navigate("/login")
+            }
+            
+        });
+        
+        
     }
 
     const getResumeApi = () => {
-        axios.get(`https://thevayani.pythonanywhere.com/get_resume/${user.id}`).then((res) => {
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.get(`https://thevayani.pythonanywhere.com/get_resume/${user.id}`, { headers }).then((res) => {
             console.log(res.data.data.data)
             let getData = JSON.parse(res.data.data.data)
             setInputValue({ ...inputValue, ...getData })
@@ -173,7 +182,8 @@ function Resume() {
     };
 
     const getUserDetails = () => {
-        axios.get(`https://thevayani.pythonanywhere.com/profile/${user.id}`)
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.get(`https://thevayani.pythonanywhere.com/profile/${user.id}`, { headers })
             .then((res) => {
                 console.log(res)
                 const getDatas = res.data.data.data

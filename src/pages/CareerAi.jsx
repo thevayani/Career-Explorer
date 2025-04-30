@@ -12,12 +12,11 @@ import axios from 'axios';
 
 
 function CareerAi(){
-
+  let Token = JSON.parse(localStorage.getItem("token")).token
   const [inputValue, setInputValue] = useState("")
   const [goalValue, setGoalValue] = useState("")
   const [userDetails, setuserDetails] = useState({})
   let getVal = { ...userDetails, details: inputValue, goals: goalValue }
-
   const [generate,setRegenerate] = useState("generate")
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
@@ -26,7 +25,8 @@ function CareerAi(){
   let val = JSON.parse(localStorage.getItem("users"))
 
   const getUpdateGoalApi = () => {
-    axios.get(`https://thevayani.pythonanywhere.com/profile/${val.id}`)
+    const headers = { 'Authorization': `Bearer ${Token}` }
+    axios.get(`https://thevayani.pythonanywhere.com/profile/${val.id}`, { headers })
         .then((res) => {
             if (res.data.data.data) {
                 const getData = JSON.parse(res.data.data.data);
@@ -34,7 +34,7 @@ function CareerAi(){
             }
         })
 
-    axios.get(`https://thevayani.pythonanywhere.com/get_goal/${val.id}`)
+    axios.get(`https://thevayani.pythonanywhere.com/get_goal/${val.id}`, { headers })
         .then((res) => {
             if (res.data.data.data) {
                 const getDatas = JSON.parse(res.data.data.data);

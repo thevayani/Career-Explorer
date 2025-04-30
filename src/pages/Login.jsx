@@ -4,13 +4,12 @@ import { Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 import image from '../assets/image.jpg'
-import { useSelector, useDispatch } from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {setLoginUsers} from '../redux/slices/login'
 
 
 
 function Login() {
-    const careerGlobalState = useSelector((state) => state.login.loginUsers)
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [loginDetails, setLoginDetails] = useState({
@@ -35,8 +34,9 @@ function Login() {
                 if (res.data.status === "success") {
                     alert("Login Successfull")
                     console.log(res.data.data)
-                    dispatch(setLoginUsers(res.data.data))     
-                    localStorage.setItem("users", JSON.stringify(res.data.data));        
+                    // dispatch(setLoginUsers(res.data.data))     
+                    localStorage.setItem("users", JSON.stringify(res.data.data));  
+                    localStorage.setItem("token", JSON.stringify(res.data.data));      
                     navigate('/details')
                 }
                 else {

@@ -1,4 +1,4 @@
-import { Form, Container, Button, Row, Col,Navbar, Table } from 'react-bootstrap';
+import { Form, Container, Button, Row, Col, Navbar, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CloseButton from 'react-bootstrap/CloseButton';
 import { CIcon } from '@coreui/icons-react';
@@ -13,6 +13,7 @@ import Header from './Header';
 function UserDetails() {
 
     let val = JSON.parse(localStorage.getItem("users"))
+    let Token = JSON.parse(localStorage.getItem("token")).token
     const navigate = useNavigate()
     const [isUpdated, setupdated] = useState(false)
     const [languageknownValue, setlanguageknownValue] = useState([]);
@@ -52,6 +53,8 @@ function UserDetails() {
         }
     );
 
+
+
     const submitBtn = () => {
         if (userInputValue.fullname == "" ||
             userInputValue.fathername == "" ||
@@ -63,36 +66,44 @@ function UserDetails() {
             alert("please enter the value")
         }
         else {
-            alert("Submitted Successfully")
             const formData = new FormData();
             formData.append("user_id", val.id);
             formData.append("data", JSON.stringify(userInputValue))
-
-            axios.post('https://thevayani.pythonanywhere.com/update_profile',formData).then((res) => {
+            const headers = { 'Authorization': `Bearer ${Token}` }
+            axios.post('https://thevayani.pythonanywhere.com/update_profile', formData, { headers }).then((res) => {
                 console.log(res)
+                alert("submitted")
+            }).catch((e) => {
+                if (e.response.status === 422 || e.response.status === 401) {
+                    alert("Token error");
+                    navigate("/login")
+                }
+                
             });
             navigate("/goal")
         }
     }
 
     const updateBtn = () => {
-        alert("Updated Successfully")
+
         const formData = new FormData();
         formData.append("user_id", val.id);
         formData.append("data", JSON.stringify(userInputValue))
-
-        axios.post('https://thevayani.pythonanywhere.com/update_profile', formData).then((res) => {
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.post('https://thevayani.pythonanywhere.com/update_profile', formData, { headers }).then((res) => {
             console.log(res)
-        });
-        navigate("/show")
+            alert("Updated Successfully")
+        })
+         navigate("/show")
     }
 
     const getUsersdetailsapi = () => {
-        axios.get(`https://thevayani.pythonanywhere.com/profile/${val.id}`).then((res) => {
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.get(`https://thevayani.pythonanywhere.com/profile/${val.id}`,{ headers }).then((res) => {
             let getData = res.data.data.data
             if (getData !== "") {
                 setuserInputValue(JSON.parse(getData));
-                setupdated(true);   
+                setupdated(true);
             } else {
                 setupdated(false);
             }
@@ -175,7 +186,7 @@ function UserDetails() {
             height: "1200px",
         }
     }>
-       <Header />
+        <Header />
         <Container>
             <Form style={
                 {
@@ -479,7 +490,7 @@ function UserDetails() {
                                 <Col sm="4">
                                     <p>
                                         <Form.Label style={{ marginTop: "10px", marginLeft: "20px" }}>
-                                           Designation
+                                            Designation
                                         </Form.Label>
                                     </p>
                                 </Col>
@@ -717,7 +728,7 @@ function UserDetails() {
                         }}>
                         Submit
                     </Button>}
-             </Form>
+            </Form>
         </Container>
     </div>
 }

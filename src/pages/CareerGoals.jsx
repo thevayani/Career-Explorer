@@ -10,6 +10,7 @@ import Header from './Header';
 
 function CareerGoals() {
     let user = JSON.parse(localStorage.getItem("users"));
+    let Token = JSON.parse(localStorage.getItem("token")).token
     const [inputValue, setInputValue] = useState("")
     const [userDetails, setuserDetails] = useState({})
     let getVal = { ...userDetails, details: inputValue};    
@@ -89,17 +90,25 @@ function CareerGoals() {
             const formData = new FormData();
             formData.append("user_id", user.id);
             formData.append("data", JSON.stringify(goalsDetails));
-
-            axios.post('https://thevayani.pythonanywhere.com/goal', formData).then((res) => {
+            const headers = { 'Authorization': `Bearer ${Token}` }
+            axios.post('https://thevayani.pythonanywhere.com/goal', formData, { headers }).then((res) => {
                 console.log(res)
-            })
-            alert("submitted successfully");
+                alert("submitted successfully");
+            }).catch((e) => {
+                if (e.response.status === 422 || e.response.status === 401) {
+                    alert("Token error");
+                    navigate("/login")
+                }
+                
+            });
+            
             navigate("/show");
         }
     }
 
     const getgoalDetailsApi = () => {
-        axios.get(`https://thevayani.pythonanywhere.com/get_goal/${user.id}`)
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.get(`https://thevayani.pythonanywhere.com/get_goal/${user.id}`,{ headers })
             .then((res) => {
                 let getData = res.data.data.data
                 setGoalDetails(JSON.parse(getData))
@@ -108,7 +117,8 @@ function CareerGoals() {
     }
 
     const getUpdateGoalApi = () => {
-        axios.get(`https://thevayani.pythonanywhere.com/profile/${user.id}`)
+        const headers = { 'Authorization': `Bearer ${Token}` }
+        axios.get(`https://thevayani.pythonanywhere.com/profile/${user.id}`,{ headers })
             .then((res) => {
                 if (res.data.data.data) {
                     const getData = JSON.parse(res.data.data.data);
